@@ -491,7 +491,7 @@ body[data-slug="notes"] {
   --color-muted: #333333;
   --color-border: #e5e5e5;
   --hero-name: #332211;
-  --max-width-wide: 900px;
+  --max-width-wide: 800px;
   background-color: var(--color-bg) !important;
   font-family: "Raleway", "Josefin Sans", sans-serif;
   color: var(--color-text);
@@ -508,7 +508,7 @@ body[data-slug="notes"] {
     & > .center {
       max-width: var(--max-width-wide);
       margin: 0 auto;
-      padding: 0 2rem;
+      padding: 0 4rem;
       background: transparent;
     }
   }
@@ -566,6 +566,13 @@ body[data-slug="notes"] {
 
   .blog-index {
     padding-top: 5rem; /* clear fixed header */
+  }
+
+  // Dark mode: match reference image hover (lighter grey background, accent bar + title)
+  :root[saved-theme="dark"] & {
+    .blog-post-card:hover {
+      background-color: #282828;
+    }
   }
 
   footer {

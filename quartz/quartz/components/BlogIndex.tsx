@@ -65,6 +65,8 @@ const BlogIndex: QuartzComponent = ({ allFiles, fileData, cfg }: QuartzComponent
         </nav>
       </header>
 
+      <div class="blog-index-top-line"></div>
+
       <div class="blog-index-header">
         <p class="blog-index-count">{posts.length} blog articles written</p>
       </div>
@@ -93,10 +95,10 @@ const BlogIndex: QuartzComponent = ({ allFiles, fileData, cfg }: QuartzComponent
 
                       return (
                         <li class="blog-post-item">
-                          <a href={href} class="blog-post-link">
-                            {title}
+                          <a href={href} class="blog-post-card">
+                            <span class="blog-post-link">{title}</span>
+                            <span class="blog-post-date">{dateStr}</span>
                           </a>
-                          <span class="blog-post-date">{dateStr}</span>
                         </li>
                       )
                     })}
@@ -117,7 +119,9 @@ const BlogIndex: QuartzComponent = ({ allFiles, fileData, cfg }: QuartzComponent
               const href = resolveRelative(fileData.slug!, page.slug!)
               return (
                 <li class="blog-post-item">
-                  <a href={href} class="blog-post-link">{title}</a>
+                  <a href={href} class="blog-post-card">
+                    <span class="blog-post-link">{title}</span>
+                  </a>
                 </li>
               )
             })}
@@ -146,10 +150,18 @@ BlogIndex.css = `
   padding: 2rem 0 0;
 }
 
+.blog-index-top-line {
+  width: 100%;
+  height: 1px;
+  background: var(--color-border);
+  margin: 0 0 2rem 0;
+}
+
 .blog-index-header {
   margin-bottom: 2rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid var(--color-border);
+  text-align: center;
 }
 
 .blog-index-count {
@@ -159,7 +171,8 @@ BlogIndex.css = `
 }
 
 .blog-year-group {
-  margin-bottom: 2rem;
+  max-width: 100%;
+  margin: 0 auto 2rem auto;
 }
 
 .blog-year-heading {
@@ -174,7 +187,6 @@ BlogIndex.css = `
 
 .blog-month-group {
   margin-bottom: 1.5rem;
-  margin-left: 0.25rem;
 }
 
 .blog-month-heading {
@@ -192,29 +204,41 @@ BlogIndex.css = `
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.5rem;
 }
 
 .blog-post-item {
+  line-height: 1.4;
+}
+
+.blog-post-card {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 1rem;
-  padding: 0.3rem 0;
-  line-height: 1.4;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  border-left: 3px solid transparent;
+  text-decoration: none !important;
+  transition: background-color 0.15s ease, border-left-color 0.15s ease;
+}
+
+.blog-post-card:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-left-color: #eb5c79;
 }
 
 .blog-post-link {
   color: var(--color-text) !important;
-  text-decoration: none !important;
   font-weight: 400;
   font-size: 0.95rem;
-  background: none !important;
+  flex: 1;
+  min-width: 0;
   transition: color 0.15s ease;
 }
 
-.blog-post-link:hover {
-  color: var(--hero-name) !important;
+.blog-post-card:hover .blog-post-link {
+  color: #eb5c79 !important;
 }
 
 .blog-post-date {
@@ -223,12 +247,14 @@ BlogIndex.css = `
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   flex-shrink: 0;
+  margin-left: 0.75rem;
 }
 
 .blog-index-footer {
   margin-top: 2.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--color-border);
+  text-align: center;
 }
 
 .blog-browse-link {
@@ -257,13 +283,15 @@ BlogIndex.css = `
 }
 
 @media (max-width: 800px) {
-  .blog-post-item {
+  .blog-post-card {
     flex-direction: column;
-    gap: 0.1rem;
+    align-items: flex-start;
+    gap: 0.25rem;
   }
 
   .blog-post-date {
     font-size: 0.8rem;
+    margin-left: 0;
   }
 }
 `
