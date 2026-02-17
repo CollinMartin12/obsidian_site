@@ -5,7 +5,9 @@ import * as Component from "./quartz/components"
 export const sharedPageComponents: SharedLayout = {
   head: Component.Head(),
   header: [],
-  afterBody: [],
+  afterBody: [
+    Component.TagList(),
+  ],
   footer: Component.Footer({
     links: {
       GitHub: "https://github.com/collinmartin",
@@ -15,32 +17,11 @@ export const sharedPageComponents: SharedLayout = {
   }),
 }
 
-// Layout for notes index (and blog) – list of notes + explorer
+// Layout for notes index (and blog) – clean centered list, no sidebars
 export const blogIndexLayout: PageLayout = {
-  beforeBody: [
-    Component.Breadcrumbs(),
-    Component.BlogIndex(),
-  ],
-  left: [
-    Component.PageTitle(),
-    Component.MobileOnly(Component.Spacer()),
-    Component.Flex({
-      components: [
-        {
-          Component: Component.Search(),
-          grow: true,
-        },
-        { Component: Component.Darkmode() },
-        { Component: Component.ReaderMode() },
-      ],
-    }),
-    Component.Explorer(),
-  ],
-  right: [
-    Component.Graph(),
-    Component.DesktopOnly(Component.TableOfContents()),
-    Component.Backlinks(),
-  ],
+  beforeBody: [Component.BlogIndex()],
+  left: [],
+  right: [],
 }
 
 // components for pages that display a single page (e.g. a single note)
@@ -52,7 +33,6 @@ export const defaultContentPageLayout: PageLayout = {
     }),
     Component.ArticleTitle(),
     Component.ContentMeta(),
-    Component.TagList(),
   ],
   left: [
     Component.PageTitle(),
@@ -64,15 +44,12 @@ export const defaultContentPageLayout: PageLayout = {
           grow: true,
         },
         { Component: Component.Darkmode() },
-        { Component: Component.ReaderMode() },
       ],
     }),
     Component.Explorer(),
   ],
   right: [
-    Component.Graph(),
     Component.DesktopOnly(Component.TableOfContents()),
-    Component.Backlinks(),
   ],
 }
 

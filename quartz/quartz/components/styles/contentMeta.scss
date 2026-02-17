@@ -1,14 +1,31 @@
 .content-meta {
-  margin-top: 0;
-  color: var(--darkgray);
+  margin-top: 0.4rem;
+  margin-bottom: 1.5rem;
+  color: var(--gray);
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
 
-  &[show-comma="true"] {
-    > *:not(:last-child) {
-      margin-right: 8px;
+  .meta-icon {
+    width: 13px;
+    height: 13px;
+    margin-right: 0.3rem;
+    vertical-align: -1px;
+    opacity: 0.65;
+    flex-shrink: 0;
+  }
 
-      &::after {
-        content: ",";
-      }
-    }
+  .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .meta-separator {
+    margin: 0 0.5rem;
+    opacity: 0.4;
+    font-size: 0.7em;
   }
 }

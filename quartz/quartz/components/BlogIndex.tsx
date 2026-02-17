@@ -1,78 +1,137 @@
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
 import { byDateAndAlphabetical } from "./PageList"
 import { resolveRelative } from "../util/path"
-import { Date, getDate } from "./Date"
+import { getDate } from "./Date"
 import { i18n } from "../i18n"
 
-const MAX_PREVIEW_WORDS = 30
+/** Base URL for the main portfolio site (for "Collin Martin" and section links). Use full URL if notes are on a subdomain. */
+const MAIN_SITE_HOME = "/"
 
-const getPreview = (text: string | undefined): string => {
-  if (!text) return ""
-  const words = text.split(/\s+/)
-  if (words.length <= MAX_PREVIEW_WORDS) return text
-  return words.slice(0, MAX_PREVIEW_WORDS).join(" ") + "…"
-}
+const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+]
 
 const BlogIndex: QuartzComponent = ({ allFiles, fileData, cfg }: QuartzComponentProps) => {
   const sort = byDateAndAlphabetical(cfg)
-  const isNotesHome = fileData.slug === "index" || fileData.slug === "notes"
+  const notesHref = resolveRelative(fileData.slug!, "notes")
 
   const posts = allFiles
     .filter((page) => {
       const slug = (page.slug as string | undefined) ?? ""
-
       if (!slug) return false
       if (slug === "index" || slug === "blog" || slug === "notes") return false
       if (slug === "projects" || slug.startsWith("projects/")) return false
       if (slug.startsWith("tags/")) return false
       if (slug.endsWith("/index")) return false
-
-      // Everything else under content is treated as a blog-style entry
       return true
     })
     .sort(sort)
 
   const t = i18n(cfg.locale)
 
+  // Group posts by year then month
+  const grouped: Map<number, Map<number, typeof posts>> = new Map()
+  const undated: typeof posts = []
+  for (const page of posts) {
+    const date = getDate(cfg, page)
+    if (!date) {
+      undated.push(page)
+      continue
+    }
+    const d = new Date(date)
+    const year = d.getFullYear()
+    const month = d.getMonth()
+    if (!grouped.has(year)) grouped.set(year, new Map())
+    const yearMap = grouped.get(year)!
+    if (!yearMap.has(month)) yearMap.set(month, [])
+    yearMap.get(month)!.push(page)
+  }
+
+  const sortedYears = [...grouped.keys()].sort((a, b) => b - a)
+
   return (
     <section class="blog-index">
+      <header class="site-header">
+        <nav class="nav" aria-label="Main">
+          <a href={MAIN_SITE_HOME} class="nav__name">Collin Martin</a>
+          <div class="nav__links">
+            <a href={`${MAIN_SITE_HOME}#about`}>About</a>
+            <a href={`${MAIN_SITE_HOME}#projects`}>Projects</a>
+            <a href={`${MAIN_SITE_HOME}#skills`}>Skills</a>
+            <a href={`${MAIN_SITE_HOME}#connect`}>Connect</a>
+            <a href={notesHref}>Notes</a>
+          </div>
+        </nav>
+      </header>
+
       <div class="blog-index-header">
-        <h1>{isNotesHome ? "Notes" : "Blog"}</h1>
-        <p class="blog-index-subtitle">{isNotesHome ? "Recent notes" : "Recent writing and notes"}</p>
+        <p class="blog-index-count">{posts.length} blog articles written</p>
       </div>
 
-      <div class="blog-index-list">
-        {posts.map((page) => {
-          const title =
-            page.frontmatter?.title ?? t.propertyDefaults.title
-          const href = resolveRelative(fileData.slug!, page.slug!)
-          const description = (page.description as string | undefined) ?? ""
+      {sortedYears.map((year) => {
+        const yearMap = grouped.get(year)!
+        const sortedMonths = [...yearMap.keys()].sort((a, b) => b - a)
 
-          return (
-            <article class="blog-card">
-              <header class="blog-card-header">
-                <h2 class="blog-card-title">
-                  <a href={href} class="internal">
-                    {title}
-                  </a>
-                </h2>
-                {page.dates && (
-                  <p class="blog-card-meta">
-                    <Date date={getDate(cfg, page)!} locale={cfg.locale} />
-                  </p>
-                )}
-              </header>
-              {description && (
-                <p class="blog-card-excerpt">{getPreview(description)}</p>
-              )}
-            </article>
-          )
-        })}
-      </div>
+        return (
+          <div class="blog-year-group">
+            <h3 class="blog-year-heading">{year}</h3>
+            {sortedMonths.map((month) => {
+              const monthPosts = yearMap.get(month)!
+              return (
+                <div class="blog-month-group">
+                  <h4 class="blog-month-heading">{MONTHS[month]}</h4>
+                  <ul class="blog-month-list">
+                    {monthPosts.map((page) => {
+                      const title = page.frontmatter?.title ?? t.propertyDefaults.title
+                      const href = resolveRelative(fileData.slug!, page.slug!)
+                      const date = getDate(cfg, page)
+                      const d = date ? new Date(date) : null
+                      const dateStr = d
+                        ? `${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+                        : ""
+
+                      return (
+                        <li class="blog-post-item">
+                          <a href={href} class="blog-post-link">
+                            {title}
+                          </a>
+                          <span class="blog-post-date">{dateStr}</span>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </div>
+              )
+            })}
+          </div>
+        )
+      })}
+
+      {undated.length > 0 && (
+        <div class="blog-year-group">
+          <h3 class="blog-year-heading">Other</h3>
+          <ul class="blog-month-list">
+            {undated.map((page) => {
+              const title = page.frontmatter?.title ?? t.propertyDefaults.title
+              const href = resolveRelative(fileData.slug!, page.slug!)
+              return (
+                <li class="blog-post-item">
+                  <a href={href} class="blog-post-link">{title}</a>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      )}
 
       <div class="blog-index-footer">
-        <a href={resolveRelative(fileData.slug!, "Welcome")} class="blog-see-more-button">
-          See more notes
+        <a href={resolveRelative(fileData.slug!, "notes")} class="blog-browse-link">
+          Browse all notes
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
         </a>
       </div>
     </section>
@@ -80,90 +139,132 @@ const BlogIndex: QuartzComponent = ({ allFiles, fileData, cfg }: QuartzComponent
 }
 
 BlogIndex.css = `
+/* Blog index – uses main site palette (--color-* set in custom.scss for these pages) */
 .blog-index {
-  max-width: 900px;
-  margin: 0 auto 4rem auto;
-  padding: 1rem 0 0 0;
+  max-width: 100%;
+  margin: 0 auto 2rem auto;
+  padding: 2rem 0 0;
 }
 
 .blog-index-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--color-border);
 }
 
-.blog-index-header h1 {
+.blog-index-count {
   margin: 0;
-  font-size: 2rem;
-  color: var(--dark);
-}
-
-.blog-index-subtitle {
-  margin-top: 0.4rem;
-  color: var(--darkgray);
+  color: var(--color-muted);
   font-size: 0.95rem;
 }
 
-.blog-index-list {
+.blog-year-group {
+  margin-bottom: 2rem;
+}
+
+.blog-year-heading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--hero-name);
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--color-border);
+  display: inline-block;
+}
+
+.blog-month-group {
+  margin-bottom: 1.5rem;
+  margin-left: 0.25rem;
+}
+
+.blog-month-heading {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.6rem 0;
+}
+
+.blog-month-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.35rem;
 }
 
-.blog-card {
-  padding-bottom: 1.25rem;
-  border-bottom: 1px solid var(--lightgray);
-}
-
-.blog-card-header {
+.blog-post-item {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 1rem;
+  padding: 0.3rem 0;
+  line-height: 1.4;
 }
 
-.blog-card-title {
-  margin: 0;
-  font-size: 1.2rem;
-}
-
-.blog-card-title a {
-  color: var(--dark);
-}
-
-.blog-card-meta {
-  margin: 0;
-  font-size: 0.8rem;
-  color: var(--gray);
-  white-space: nowrap;
-}
-
-.blog-card-excerpt {
-  margin: 0.5rem 0 0 0;
+.blog-post-link {
+  color: var(--color-text) !important;
+  text-decoration: none !important;
+  font-weight: 400;
   font-size: 0.95rem;
-  color: var(--darkgray);
+  background: none !important;
+  transition: color 0.15s ease;
+}
+
+.blog-post-link:hover {
+  color: var(--hero-name) !important;
+}
+
+.blog-post-date {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .blog-index-footer {
-  margin-top: 2rem;
-  display: flex;
-  justify-content: flex-start;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
 }
 
-.blog-see-more-button {
+.blog-browse-link {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 0.6rem 1.4rem;
-  border-radius: 999px;
-  border: 1px solid var(--dark);
-  background: var(--light);
-  color: var(--dark);
-  font-size: 0.85rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  gap: 0.4rem;
+  color: var(--hero-name) !important;
+  text-decoration: none !important;
+  background: none !important;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: gap 0.2s ease, color 0.15s ease;
 }
 
-.blog-see-more-button:hover {
-  background: var(--lightgray);
+.blog-browse-link:hover {
+  gap: 0.7rem;
+  color: var(--color-text) !important;
+}
+
+.blog-browse-link svg {
+  transition: transform 0.2s ease;
+}
+
+.blog-browse-link:hover svg {
+  transform: translateX(2px);
+}
+
+@media (max-width: 800px) {
+  .blog-post-item {
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .blog-post-date {
+    font-size: 0.8rem;
+  }
 }
 `
 

@@ -22,15 +22,20 @@ button.toc-header {
   align-items: center;
 
   & h3 {
-    font-size: 1rem;
+    font-size: 0.75rem;
     display: inline-block;
     margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
   }
 
   & .fold {
     margin-left: 0.5rem;
     transition: transform 0.3s ease;
-    opacity: 0.8;
+    opacity: 0.6;
+    width: 16px;
+    height: 16px;
   }
 
   &.collapsed .fold {
@@ -43,24 +48,36 @@ ul.toc-content.overflow {
   position: relative;
   margin: 0.5rem 0;
   padding: 0;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--lightgray);
   max-height: calc(100% - 2rem);
   overscroll-behavior: contain;
   list-style: none;
 
+  & > li {
+    margin: 0.2rem 0;
+  }
+
   & > li > a {
-    color: var(--dark);
-    opacity: 0.35;
+    color: var(--darkgray);
+    opacity: 0.5;
+    font-size: 0.82rem;
+    font-weight: 400;
+    line-height: 1.6;
+    text-decoration: none;
     transition:
-      0.5s ease opacity,
+      0.3s ease opacity,
       0.3s ease color;
+
     &.in-view {
-      opacity: 0.75;
+      opacity: 1;
+      color: var(--dark);
     }
   }
 
   @for $i from 0 through 6 {
     & .depth-#{$i} {
-      padding-left: calc(1rem * #{$i});
+      padding-left: calc(0.75rem * #{$i});
     }
   }
 }

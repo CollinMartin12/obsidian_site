@@ -36,10 +36,22 @@ export default (() => {
     )
     const ogImageDefaultPath = `https://${cfg.baseUrl}/static/og-image.png`
 
+    const isNotesShell = fileData.slug === "index" || fileData.slug === "blog" || fileData.slug === "notes"
+
     return (
       <head>
         <title>{title}</title>
         <meta charSet="utf-8" />
+        {isNotesShell && (
+          <>
+            <link rel="preconnect" href="https://fonts.googleapis.com" />
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+            <link
+              rel="stylesheet"
+              href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap"
+            />
+          </>
+        )}
         {cfg.theme.cdnCaching && cfg.theme.fontOrigin === "googleFonts" && (
           <>
             <link rel="preconnect" href="https://fonts.googleapis.com" />

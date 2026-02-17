@@ -480,3 +480,109 @@
     max-width: none !important;
   }
 }
+
+// Shared nav and main-site color scheme for blog/index/notes (consistent with main-site)
+body[data-slug="blog"],
+body[data-slug="index"],
+body[data-slug="notes"] {
+  // Main site palette (match main-site/src/styles/global.css)
+  --color-bg: #ffffff;
+  --color-text: #1a1a1a;
+  --color-muted: #333333;
+  --color-border: #e5e5e5;
+  --hero-name: #332211;
+  --max-width-wide: 900px;
+  background-color: var(--color-bg) !important;
+  font-family: "Raleway", "Josefin Sans", sans-serif;
+  color: var(--color-text);
+
+  .page > #quartz-body {
+    display: block !important;
+    background-color: var(--color-bg);
+
+    & > .sidebar.left,
+    & > .sidebar.right {
+      display: none !important;
+    }
+
+    & > .center {
+      max-width: var(--max-width-wide);
+      margin: 0 auto;
+      padding: 0 2rem;
+      background: transparent;
+    }
+  }
+
+  // Same fixed header and nav as main site (Layout.astro + global.css)
+  .blog-index .site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: var(--color-bg);
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .blog-index .nav {
+    max-width: var(--max-width-wide);
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+
+  .blog-index .nav__name {
+    font-weight: 500;
+    color: var(--color-muted);
+    text-decoration: none;
+  }
+
+  .blog-index .nav__name:hover {
+    color: var(--color-text);
+  }
+
+  .blog-index .nav__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+
+    a {
+      color: var(--color-muted);
+      text-decoration: none;
+      font-weight: 400;
+      transition: color 0.15s ease;
+    }
+
+    a:hover {
+      color: var(--color-text);
+    }
+  }
+
+  .blog-index {
+    padding-top: 5rem; /* clear fixed header */
+  }
+
+  footer {
+    max-width: var(--max-width-wide);
+    margin: 0 auto;
+    padding: 2rem 2rem 2.5rem;
+    text-align: center;
+    border-top: 1px solid var(--color-border);
+    color: #777777;
+    font-size: 0.9rem;
+
+    a {
+      color: var(--color-muted);
+      text-decoration: none;
+      &:hover {
+        color: var(--color-text);
+      }
+    }
+  }
+}

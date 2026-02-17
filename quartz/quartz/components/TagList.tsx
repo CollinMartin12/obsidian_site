@@ -29,9 +29,11 @@ TagList.css = `
   list-style: none;
   display: flex;
   padding-left: 0;
-  gap: 0.4rem;
-  margin: 1rem 0;
+  gap: 0.5rem;
+  margin: 0.5rem 0 1.5rem 0;
   flex-wrap: wrap;
+  border-top: 1px solid var(--lightgray);
+  padding-top: 1rem;
 }
 
 .section-li > .section > .tags {
@@ -46,10 +48,20 @@ TagList.css = `
 }
 
 a.internal.tag-link {
-  border-radius: 8px;
-  background-color: var(--highlight);
-  padding: 0.2rem 0.4rem;
-  margin: 0 0.1rem;
+  border-radius: 4px;
+  background-color: var(--lightgray) !important;
+  padding: 0.2rem 0.6rem;
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--darkgray) !important;
+  text-decoration: none !important;
+  transition: background-color 0.15s ease;
+}
+
+a.internal.tag-link:hover {
+  background-color: var(--gray) !important;
+  color: var(--dark) !important;
 }
 `
 
