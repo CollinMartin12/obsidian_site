@@ -4,8 +4,8 @@ import { resolveRelative } from "../util/path"
 import { getDate } from "./Date"
 import { i18n } from "../i18n"
 
-/** Base URL for the main portfolio site (for "Collin Martin" and section links). Use full URL if notes are on a subdomain. */
-const MAIN_SITE_HOME = "/"
+/** Base URL for the main portfolio site – links always point to cmmdoes.com */
+const MAIN_SITE_HOME = "https://cmmdoes.com"
 
 /** Append .html so links work on static hosting (e.g. Netlify) when served from /content/blog.html */
 function toStaticHref(url: string): string {
@@ -61,11 +61,11 @@ const BlogIndex: QuartzComponent = ({ allFiles, fileData, cfg }: QuartzComponent
         <nav class="nav" aria-label="Main">
           <a href={MAIN_SITE_HOME} class="nav__name">Collin Martin</a>
           <div class="nav__links">
-            <a href={`${MAIN_SITE_HOME}#about`}>About</a>
-            <a href={`${MAIN_SITE_HOME}#projects`}>Projects</a>
-            <a href={`${MAIN_SITE_HOME}#skills`}>Skills</a>
-            <a href={`${MAIN_SITE_HOME}#connect`}>Connect</a>
-            <a href={notesHref}>Notes</a>
+            <a href={`${MAIN_SITE_HOME}/#about`}>About</a>
+            <a href={`${MAIN_SITE_HOME}/#projects`}>Projects</a>
+            <a href={`${MAIN_SITE_HOME}/#skills`}>Skills</a>
+            <a href={`${MAIN_SITE_HOME}/#connect`}>Connect</a>
+            <a href={`${MAIN_SITE_HOME}/content/notes.html`}>Notes</a>
           </div>
         </nav>
       </header>
@@ -214,8 +214,9 @@ BlogIndex.css = `
 .blog-post-card {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   gap: 1rem;
+  width: 100%;
   padding: 0.9rem 1rem;
   border-radius: 10px;
   border: 1px solid var(--color-border, rgba(0, 0, 0, 0.1));
@@ -234,7 +235,7 @@ BlogIndex.css = `
   color: var(--color-text) !important;
   font-weight: 400;
   font-size: 0.95rem;
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
   transition: color 0.15s ease;
 }
@@ -243,9 +244,9 @@ BlogIndex.css = `
   color: #eb5c79 !important;
 }
 
-/* Date in its own text bar, positioned at end of card */
+/* Date published – aligned to far right of card */
 .blog-post-date-bar {
-  flex-shrink: 0;
+  flex: 0 0 auto;
   margin-left: auto;
   padding: 0.25rem 0.6rem;
   background: var(--color-border, rgba(0, 0, 0, 0.08));
