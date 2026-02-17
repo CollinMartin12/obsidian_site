@@ -25,6 +25,7 @@ import Flex from "./Flex"
 import ConditionalRender from "./ConditionalRender"
 import PortfolioLanding from "./PortfolioLanding"
 import BlogIndex from "./BlogIndex"
+import NavBar from "./NavBar"
 
 export {
   ArticleTitle,
@@ -54,4 +55,5 @@ export {
   ConditionalRender,
   PortfolioLanding,
   BlogIndex,
+  NavBar,
 }

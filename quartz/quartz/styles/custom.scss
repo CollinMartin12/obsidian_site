@@ -1,5 +1,21 @@
 @use "./base.scss";
 
+/* Global: push page content below the fixed NavBar */
+#quartz-root .page > .center {
+  padding-top: 4.5rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* Article content styles */
+article {
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
 // Portfolio Landing Page Styles
 .portfolio-landing {
   width: 100%;
@@ -483,13 +499,14 @@
 
 // Notes list page: main-site style (no sidebars, BlogIndex layout)
 body[data-slug="notes"] {
-  // Main site palette (match main-site/src/styles/global.css)
+  // White background, all text and lines black
   --color-bg: #ffffff;
-  --color-text: #1a1a1a;
-  --color-muted: #333333;
-  --color-border: #e5e5e5;
-  --hero-name: #332211;
+  --color-text: #000000;
+  --color-muted: #000000;
+  --color-border: #000000;
+  --hero-name: #000000;
   --max-width-wide: 720px;
+  --nav-max-width: 1100px;
   background-color: var(--color-bg) !important;
   font-family: "Raleway", "Josefin Sans", sans-serif;
   color: var(--color-text);
@@ -530,94 +547,136 @@ body[data-slug="notes"] {
     display: none !important;
   }
 
-  // Same fixed header and nav as main site (Layout.astro + global.css)
-  .blog-index .site-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    background: var(--color-bg);
-    padding: 1.25rem 2rem;
-    border-bottom: 1px solid var(--color-border);
-    box-shadow: 0 1px 0 var(--color-border);
-  }
-
-  @media (min-width: 640px) {
-    .blog-index .site-header {
-      padding: 1.5rem 2.5rem;
-    }
-  }
-
-  .blog-index .nav {
-    max-width: 1100px;
-    margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-    font-size: 0.95rem;
-    font-weight: 400;
-  }
-
-  .blog-index .nav__name {
-    font-weight: 500;
-    color: var(--color-muted);
-    text-decoration: none;
-  }
-
-  .blog-index .nav__name:hover {
-    color: var(--color-text);
-  }
-
-  .blog-index .nav__links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2.5rem;
-    align-items: center;
-
-    a {
-      color: var(--color-muted);
-      text-decoration: none;
-      font-weight: 400;
-      transition: color 0.15s ease;
-    }
-
-    a:hover {
-      color: var(--color-text);
-    }
-  }
-
   .blog-index {
-    padding-top: 5.5rem; /* clear fixed header */
+    padding-top: 1rem;
     max-width: var(--max-width-wide);
     margin-left: auto;
     margin-right: auto;
+    width: 100%;
+    margin-bottom: 2.5rem;
   }
 
-  // Dark mode: hover glow
-  :root[saved-theme="dark"] & {
-    .blog-post-card:hover {
-      background-color: rgba(235, 92, 121, 0.12);
-      box-shadow: 0 4px 24px rgba(235, 92, 121, 0.35);
-    }
+  .blog-index-top-line {
+    display: none;
   }
 
-  /* Tag pills (e.g. # publish) fit and wrap inside their container */
-  .tags,
-  ul.tags {
-    flex-wrap: wrap;
+  .blog-index-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    text-align: center;
+  }
+
+  .blog-index-count {
+    margin: 0;
+    color: #000000;
+    font-size: 0.95rem;
+  }
+
+  .blog-year-group {
+    width: 100%;
+    margin: 0 auto 2rem auto;
+  }
+
+  .blog-year-heading {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #000000;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0;
+    display: inline-block;
+  }
+
+  .blog-month-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .blog-month-heading {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #000000;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 0.6rem 0;
+  }
+
+  .blog-month-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .blog-post-item {
+    line-height: 1.4;
+  }
+
+  .blog-post-card {
+    --card-accent: #eb5c79;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+    padding: 0.65rem 1rem 0.65rem 1rem;
+    border-left: 3px solid transparent;
+    border-bottom: 1px solid #e0e0e0;
+    text-decoration: none !important;
+    background: #fff;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .blog-post-item:first-child .blog-post-card {
+    border-top: 1px solid #e0e0e0;
+  }
+
+  .blog-post-card:hover {
+    border-left-color: var(--card-accent);
+    background-color: color-mix(in srgb, var(--card-accent) 4%, #fff);
+  }
+
+  .blog-post-link {
+    color: #1a1a1a !important;
+    font-weight: 400;
+    font-size: 0.9rem;
     min-width: 0;
-    overflow-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 0.2s ease;
   }
 
+  .blog-post-card:hover .blog-post-link {
+    color: var(--card-accent) !important;
+  }
+
+  .blog-post-date-bar {
+    justify-self: end;
+    flex-shrink: 0;
+    padding: 0;
+    background: none;
+    border-radius: 0;
+    color: #999;
+    font-size: 0.8rem;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+
+  .blog-post-card:hover .blog-post-date-bar {
+    color: var(--card-accent);
+  }
+
+  /* Hide tag pills and #publish on notes page */
+  .tags,
+  ul.tags,
   .tag-link,
-  a.internal.tag-link {
-    max-width: 100%;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    box-sizing: border-box;
+  a.internal.tag-link,
+  article .tag-link,
+  .center .tags {
+    display: none !important;
   }
 
   footer {
@@ -626,7 +685,7 @@ body[data-slug="notes"] {
     padding: 2rem 2rem 2.5rem;
     text-align: center;
     border-top: 1px solid var(--color-border);
-    color: #777777;
+    color: #000000;
     font-size: 0.9rem;
 
     a {
