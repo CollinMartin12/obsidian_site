@@ -36,7 +36,7 @@ export default (() => {
     )
     const ogImageDefaultPath = `https://${cfg.baseUrl}/static/og-image.png`
 
-    const isNotesShell = fileData.slug === "index" || fileData.slug === "blog" || fileData.slug === "notes"
+    const isNotesShell = fileData.slug === "index" || fileData.slug === "notes"
 
     return (
       <head>

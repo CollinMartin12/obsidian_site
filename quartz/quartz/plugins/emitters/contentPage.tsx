@@ -26,9 +26,9 @@ async function processContent(
   const slug = fileData.slug!
   const cfg = ctx.cfg.configuration
 
-  // Index, blog, and notes use the notes list layout (page that displays all notes)
+  // Notes uses the list layout; index shows the Obsidian Workflow article (default layout)
   const layoutToUse =
-    slug === "index" || slug === "blog" || slug === "notes"
+    slug === "notes"
       ? {
           ...sharedPageComponents,
           ...blogIndexLayout,

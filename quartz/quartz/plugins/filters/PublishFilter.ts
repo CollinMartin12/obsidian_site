@@ -6,8 +6,8 @@ export const PublishFilter: QuartzFilterPlugin = () => ({
     const content = vfile.value?.toString() || ""
     const slug = (vfile.data as any)?.slug as string | undefined
 
-    // Always allow special pages: blog index and notes (all-notes list)
-    if (slug === "blog" || slug === "notes") {
+    // Always allow special pages: index (home) and notes (all-notes list)
+    if (slug === "notes") {
       return true
     }
 

@@ -7,6 +7,11 @@ import { i18n } from "../i18n"
 /** Base URL for the main portfolio site (for "Collin Martin" and section links). Use full URL if notes are on a subdomain. */
 const MAIN_SITE_HOME = "/"
 
+/** Append .html so links work on static hosting (e.g. Netlify) when served from /content/blog.html */
+function toStaticHref(url: string): string {
+  return url.endsWith("/") ? url : url + ".html"
+}
+
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
@@ -14,13 +19,13 @@ const MONTHS = [
 
 const BlogIndex: QuartzComponent = ({ allFiles, fileData, cfg }: QuartzComponentProps) => {
   const sort = byDateAndAlphabetical(cfg)
-  const notesHref = resolveRelative(fileData.slug!, "notes")
+  const notesHref = toStaticHref(resolveRelative(fileData.slug!, "notes"))
 
   const posts = allFiles
     .filter((page) => {
       const slug = (page.slug as string | undefined) ?? ""
       if (!slug) return false
-      if (slug === "index" || slug === "blog" || slug === "notes") return false
+      if (slug === "index" || slug === "notes") return false
       if (slug === "projects" || slug.startsWith("projects/")) return false
       if (slug.startsWith("tags/")) return false
       if (slug.endsWith("/index")) return false
@@ -86,7 +91,7 @@ const BlogIndex: QuartzComponent = ({ allFiles, fileData, cfg }: QuartzComponent
                   <ul class="blog-month-list">
                     {monthPosts.map((page) => {
                       const title = page.frontmatter?.title ?? t.propertyDefaults.title
-                      const href = resolveRelative(fileData.slug!, page.slug!)
+                      const href = toStaticHref(resolveRelative(fileData.slug!, page.slug!))
                       const date = getDate(cfg, page)
                       const d = date ? new Date(date) : null
                       const dateStr = d
@@ -97,7 +102,9 @@ const BlogIndex: QuartzComponent = ({ allFiles, fileData, cfg }: QuartzComponent
                         <li class="blog-post-item">
                           <a href={href} class="blog-post-card">
                             <span class="blog-post-link">{title}</span>
-                            <span class="blog-post-date">{dateStr}</span>
+                            {dateStr && (
+                              <div class="blog-post-date-bar">{dateStr}</div>
+                            )}
                           </a>
                         </li>
                       )
@@ -116,7 +123,7 @@ const BlogIndex: QuartzComponent = ({ allFiles, fileData, cfg }: QuartzComponent
           <ul class="blog-month-list">
             {undated.map((page) => {
               const title = page.frontmatter?.title ?? t.propertyDefaults.title
-              const href = resolveRelative(fileData.slug!, page.slug!)
+              const href = toStaticHref(resolveRelative(fileData.slug!, page.slug!))
               return (
                 <li class="blog-post-item">
                   <a href={href} class="blog-post-card">
@@ -128,16 +135,6 @@ const BlogIndex: QuartzComponent = ({ allFiles, fileData, cfg }: QuartzComponent
           </ul>
         </div>
       )}
-
-      <div class="blog-index-footer">
-        <a href={resolveRelative(fileData.slug!, "notes")} class="blog-browse-link">
-          Browse all notes
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12"/>
-            <polyline points="12 5 19 12 12 19"/>
-          </svg>
-        </a>
-      </div>
     </section>
   )
 }
@@ -145,9 +142,9 @@ const BlogIndex: QuartzComponent = ({ allFiles, fileData, cfg }: QuartzComponent
 BlogIndex.css = `
 /* Blog index – uses main site palette (--color-* set in custom.scss for these pages) */
 .blog-index {
-  max-width: 100%;
-  margin: 0 auto 2rem auto;
-  padding: 2rem 0 0;
+  width: 100%;
+  margin: 0 auto 2.5rem auto;
+  padding: 0.5rem 0 0;
 }
 
 .blog-index-top-line {
@@ -171,7 +168,7 @@ BlogIndex.css = `
 }
 
 .blog-year-group {
-  max-width: 100%;
+  width: 100%;
   margin: 0 auto 2rem auto;
 }
 
@@ -209,23 +206,28 @@ BlogIndex.css = `
 
 .blog-post-item {
   line-height: 1.4;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
+/* Rectangle card – whole item selects on hover and glows */
 .blog-post-card {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 1rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  border-left: 3px solid transparent;
+  padding: 0.9rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--color-border, rgba(0, 0, 0, 0.1));
   text-decoration: none !important;
-  transition: background-color 0.15s ease, border-left-color 0.15s ease;
+  background: var(--color-bg, #fff);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .blog-post-card:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-  border-left-color: #eb5c79;
+  background-color: rgba(235, 92, 121, 0.08);
+  border-color: rgba(235, 92, 121, 0.5);
+  box-shadow: 0 4px 24px rgba(235, 92, 121, 0.3);
 }
 
 .blog-post-link {
@@ -241,57 +243,34 @@ BlogIndex.css = `
   color: #eb5c79 !important;
 }
 
-.blog-post-date {
+/* Date in its own text bar, positioned at end of card */
+.blog-post-date-bar {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 0.25rem 0.6rem;
+  background: var(--color-border, rgba(0, 0, 0, 0.08));
+  border-radius: 4px;
   color: var(--color-muted);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  flex-shrink: 0;
-  margin-left: 0.75rem;
-}
-
-.blog-index-footer {
-  margin-top: 2.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--color-border);
-  text-align: center;
-}
-
-.blog-browse-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  color: var(--hero-name) !important;
-  text-decoration: none !important;
-  background: none !important;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: gap 0.2s ease, color 0.15s ease;
-}
-
-.blog-browse-link:hover {
-  gap: 0.7rem;
-  color: var(--color-text) !important;
-}
-
-.blog-browse-link svg {
-  transition: transform 0.2s ease;
-}
-
-.blog-browse-link:hover svg {
-  transform: translateX(2px);
 }
 
 @media (max-width: 800px) {
   .blog-post-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
+    flex-direction: row;
+    flex-wrap: wrap;
   }
 
-  .blog-post-date {
+  .blog-post-link {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .blog-post-date-bar {
+    margin-left: auto;
     font-size: 0.8rem;
-    margin-left: 0;
+    padding: 0.2rem 0.5rem;
   }
 }
 `

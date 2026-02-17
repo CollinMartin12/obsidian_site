@@ -112,18 +112,16 @@ export const skills = {
 
 /**
  * Notes – links to your Quartz blog and notes (built from quartz/content/).
- * href = where the nav "Notes" link goes (default: notes index).
- * links = shown in the Notes section (Blog + Notes).
- * For a subdomain, set base to "https://notes.cmmdoes.com" and use full URLs in href and links.
+ * href = where the nav "Notes" link goes (Quartz blog index showing all notes).
+ * links = dynamically generated from Quartz contentIndex at build time.
  */
+import { notesLinks } from './notes-links.generated.js';
+
 export const notes = {
   label: "Notes",
   href: "/content/notes.html",
   description: "Writing and notes on data engineering, ML, and whatever I'm learning.",
-  links: [
-    { label: "Blog", href: "/content/blog.html" },
-    { label: "All notes", href: "/content/notes.html" },
-  ],
+  links: notesLinks.length > 0 ? notesLinks : [{ label: "All notes", href: "/content/notes.html" }],
 };
 
 export const connect = {

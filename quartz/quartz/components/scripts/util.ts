@@ -33,7 +33,19 @@ export function removeAllChildren(node: HTMLElement) {
 const canonicalRegex = /<link rel="canonical" href="([^"]*)">/
 
 export async function fetchCanonical(url: URL): Promise<Response> {
-  const res = await fetch(`${url}`)
+  let res = await fetch(`${url}`)
+
+  // Static file servers (e.g. Python http.server) don't rewrite /path to /path.html
+  // Retry with .html when we get 404 for a path without extension
+  if (!res.ok && !url.pathname.endsWith(".html") && !url.pathname.endsWith("/")) {
+    const urlWithHtml = new URL(url)
+    urlWithHtml.pathname = url.pathname + ".html"
+    const retry = await fetch(`${urlWithHtml}`)
+    if (retry.ok) {
+      res = retry
+    }
+  }
+
   if (!res.headers.get("content-type")?.startsWith("text/html")) {
     return res
   }

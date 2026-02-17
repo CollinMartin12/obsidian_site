@@ -9,13 +9,13 @@
 [build.environment]
   NODE_VERSION = "22"
 
-# Main site redirects (content/ → notes)
+# Main site redirects (content/ → home = Obsidian Workflow)
 [[redirects]]
   from = "/content"
-  to = "/content/notes.html"
+  to = "/content/index.html"
   status = 200
 
 [[redirects]]
   from = "/content/"
-  to = "/content/notes.html"
+  to = "/content/index.html"
   status = 200
