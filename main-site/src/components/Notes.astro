@@ -1,0 +1,23 @@
+---
+import { notes } from '../data/site.js';
+---
+
+<section class="notes" id="notes">
+  <h2 class="section-title">{notes.label}</h2>
+  <p class="notes__desc">{notes.description}</p>
+  <div class="notes__links">
+    {notes.links.map((item) => {
+      const isExternal = item.href.startsWith('http');
+      return (
+        <a
+          href={item.href}
+          class="notes__link"
+          target={isExternal ? '_blank' : undefined}
+          rel={isExternal ? 'noopener noreferrer' : undefined}
+        >
+          {item.label} →
+        </a>
+      );
+    })}
+  </div>
+</section>

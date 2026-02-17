@@ -1,0 +1,21 @@
+---
+import { about } from '../data/site.js';
+const paragraphs = about.intro.trim().split('\n\n');
+---
+
+<section class="about" id="about">
+  <h2 class="section-title">About</h2>
+  <div class="about__intro">
+    {paragraphs.map((p) => (
+      <p>{p}</p>
+    ))}
+  </div>
+  <div class="about__topics">
+    {about.topics.map((topic) => (
+      <article class="topic-card">
+        <h3 class="topic-card__title">{topic.title}</h3>
+        <p class="topic-card__desc">{topic.description}</p>
+      </article>
+    ))}
+  </div>
+</section>

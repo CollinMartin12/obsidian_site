@@ -1,0 +1,14 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# So /content and /content/ open the notes list (all notes)
+[[redirects]]
+  from = "/content"
+  to = "/content/notes.html"
+  status = 200
+
+[[redirects]]
+  from = "/content/"
+  to = "/content/notes.html"
+  status = 200

@@ -1,0 +1,38 @@
+---
+import { skills } from '../data/site.js';
+
+const ICON_BASE = 'https://cdn.simpleicons.org';
+const ICON_COLOR = '332211';
+---
+
+<section class="skills" id="skills">
+  <h2 class="skills__title">Skills & Certifications</h2>
+  <div class="skills__grid">
+    <div class="skills__group">
+      <h3 class="skills__group-title">LANGUAGES & FRAMEWORKS</h3>
+      <div class="skills__tags">
+        {skills.languagesAndFrameworks.map((item) => (
+          <span class="skill-tag" style={`--skill-color: ${item.color}`}>
+            <img src={`${ICON_BASE}/${item.icon}/${ICON_COLOR}`} alt="" class="skill-tag__icon" width="20" height="20" />
+            <span class="skill-tag__label">{item.name}</span>
+          </span>
+        ))}
+      </div>
+    </div>
+    <div class="skills__group">
+      <h3 class="skills__group-title">TOOLS & PLATFORMS</h3>
+      <div class="skills__tags">
+        {skills.toolsAndPlatforms.map((item) => (
+          <span class="skill-tag" style={`--skill-color: ${item.color}`}>
+            <img src={`${ICON_BASE}/${item.icon}/${ICON_COLOR}`} alt="" class="skill-tag__icon" width="20" height="20" />
+            <span class="skill-tag__label">{item.name}</span>
+          </span>
+        ))}
+      </div>
+    </div>
+    <div class="skills__group">
+      <h3 class="skills__group-title">CERTIFICATIONS</h3>
+      <p class="skills__coming-soon">Coming soon</p>
+    </div>
+  </div>
+</section>
