@@ -145,3 +145,5 @@ cat("Bayesian Prediction:", round(bayesian_pred, 4))
 ```
 *Frequentist Prediction: 0.2581
 Bayesian Prediction: 0.1682*
+
+#publish 

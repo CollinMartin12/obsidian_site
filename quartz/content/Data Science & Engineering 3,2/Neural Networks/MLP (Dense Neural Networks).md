@@ -36,3 +36,5 @@ The _sigmoid function_ transforms those inputs whose values lie in the domain�
 #### Tanh Function
 Like the sigmoid function, the tanh (hyperbolic tangent) function also squashes its inputs, transforming them into elements on the interval between  -1 and 1:
 ![[attachments/Pasted image 20260210102623.png]]
+
+#pubish
