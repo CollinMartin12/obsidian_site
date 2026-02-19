@@ -128,8 +128,6 @@ export const connect = {
   cta: "Follow along on my journey, reach out for collaborations, or just say hi.",
   links: [
     { label: "Instagram", href: "https://instagram.com", icon: "instagram" },
-    { label: "TikTok", href: "https://tiktok.com", icon: "tiktok" },
-    { label: "LinkedIn", href: "https://linkedin.com/in/collinmartin", icon: "linkedin" },
     { label: "GitHub", href: "https://github.com/CollinMartin12", icon: "github" },
     { label: "Email", href: "mailto:Collinmartin4p@gmail.com", icon: "email" },
   ],
