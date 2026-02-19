@@ -1,3 +1,4 @@
+
 ### 1
 Read the file Networks.csv which contains a real survey for a study of social networks and their influence on people. The variable Online.shopping contains a “Yes” if the person who filled the survey usually goes shopping online, and a “No” if he/she does not. Using a frequentist approach, answer the following questions:
 
@@ -44,3 +45,7 @@ sample estimates:
 probability of success 0.8238994*
 
 (d) Predict the probability that among the next 10 respondents to the survey, you observe 8 individuals who usually go shopping online.
+```r
+  prob_8_shoppers <- dbinom(x = 8, size = 10, prob = 0.8)
+  print(prob_8_shoppers)
+```
