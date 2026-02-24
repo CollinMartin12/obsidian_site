@@ -1,4 +1,3 @@
-
 #### Main criteria of CNN
 • Specialized kind of neural network for processing data that has a known grid-like topology
 • Specialized kind of neural network for processing data that has a known grid-like topology
@@ -143,3 +142,4 @@ Developed by DeepMind, NFNets challenge a staple of modern deep learning: Batch 
 - **Key Innovation:** NFNets entirely **removed Batch Normalization**. They achieved this by using a new technique called **Adaptive Gradient Clipping (AGC)** and carefully scaling the initial weights of the network.
     
 - **The Result:** NFNets achieved state-of-the-art ImageNet accuracy while training faster than their batch-normalized counterparts, proving that networks don't necessarily need normalization layers to reach peak performance.
+#pubish #cnn
