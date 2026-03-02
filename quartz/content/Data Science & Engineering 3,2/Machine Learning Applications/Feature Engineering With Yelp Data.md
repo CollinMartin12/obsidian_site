@@ -512,6 +512,26 @@ Unlike, the standard ML pipeline includes the data normalization (standarization
 2. **Standardization preserves the relative importance** of features while making them comparable
 3. **Many ML algorithms** (especially SVM) perform better with standardized features
 
+## Question 1 — Baseline Model
+
+**What normalization is appropriate for TF-IDF data?**
+
+`X_tfidf` is a sparse matrix with non-negative values. TF-IDF features already encode relative term importance, and many values are exactly zero (words not present in a document). The question asks what normalization is most convenient given this data type.
+
+The notebook actually uses `StandardScaler` and calls `.toarray()` first, but you should know that **StandardScaler is not the ideal choice for sparse TF-IDF data**. Here is why:
+
+StandardScaler subtracts the mean and divides by the standard deviation per feature. This destroys sparsity — after mean subtraction, all those zeros become non-zero. For a 1000-feature vocabulary where most documents only contain a fraction of words, this is wasteful both in memory and computation.
+
+The more appropriate normalization for sparse TF-IDF data is **L2 normalization per sample** (which is what `TfidfVectorizer`typically does internally anyway). This normalizes each document vector to unit length, preserving sparsity and making documents comparable regardless of length. `sklearn`'s `Normalizer(norm='l2')` does this without breaking sparsity.
+
+That said, for linear SVM on dense data (as the notebook uses after `.toarray()`), StandardScaler works fine in practice. The question is asking you to reason about the _type_ of data.
+
+**Baseline SVM vs Dummy Classifier:**
+
+The dummy classifier always predicts the majority class. With 5 star ratings in a roughly balanced dataset, expect dummy accuracy around 20–25%. The linear SVM trained on all 1,000 TF-IDF features should achieve substantially higher accuracy — likely 50–65% on test data. This gap justifies the modeling effort and sets the ceiling you are trying to approach (or match with fewer features) in subsequent sections.
+
+**Key implementation detail:** Data is split 50/50 train/test. A `GridSearchCV` over C values (log-spaced from 1e-3 to 1e3) with 5-fold CV on the training set is used to select the best regularization. The best C from CV is then evaluated on the held-out test set.
+
 ## 2. Feature extraction
 
 Now, let's analyze the advantages of including a feature extraction stage. In particular, we aim to answer this question: "How much we can reduce the size of the data without a performance degradation?"
@@ -526,6 +546,33 @@ To efficiently and successfully use these approaches we must take into account s
 Finally, take into account that the sklearn PCA, PLS and CCA method does not work with sparse arrays, so in order to apply this data transformation, you will have to start by transforming the sparse TF-IDF representation to a dense representation (you can use the `.toarray()` method of sparse arrays for this purpose).
 
 
+## Question 2 — Feature Extraction
+
+**General pipeline strategy:**
+
+The efficient approach is to fit the feature extractor (PCA/PLS/CCA) on training data once, project both train and test sets to the reduced space, and then run cross-validated classifier selection in the reduced space. This is what the `evaluate_FE`function does.
+
+The alternative — putting PCA inside a `Pipeline` and running it inside `GridSearchCV` — works correctly but is computationally expensive because PCA is refitted on every CV fold for every number of components. The "external FE" approach fits PCA once on the full training set, extracts all 500 components, then the CV loop only trains the classifier on the first k components. This is a valid optimization because PCA is unsupervised, so technically fitting it on the full training fold versus the CV training subfold introduces minimal leakage.
+
+Note: For PLS and CCA, which are supervised, doing the transform outside CV **does** introduce leakage, because the projection uses label information. The notebook includes a proper no-leakage version for PLS that handles this correctly with a manual `KFold` loop.
+
+**Why does CCA perform poorly?**
+
+CCA finds projections that maximize the correlation between two views: the projected input X and the projected output Y. It solves a **generalized eigenvalue problem** of the form:
+
+```
+C_xy * C_yy^(-1) * C_yx * v = lambda * C_xx * v
+```
+
+This requires inverting the within-view covariance matrices `C_xx` (1000×1000) and `C_yy`. With ~1,750 training samples and 1,000 features, the sample covariance matrix `C_xx` is **rank-deficient** (rank ≤ 1,750 but size 1,000, so it might be okay in terms of dimensions, but the TF-IDF covariance is still ill-conditioned because many words are highly collinear or rarely appear). The inversion becomes numerically unstable or degenerate, making the CCA projections meaningless.
+
+**The fix:** Apply PCA first to reduce the dimensionality to a manageable, well-conditioned subspace (the notebook uses 100 PCA components), then apply CCA on top. This is the "CCA + PCA" section. The PCA regularizes the problem by keeping only the directions with meaningful variance, making `C_xx` well-conditioned.
+
+**Why don't kernel methods help?**
+
+In kernel PCA, KCCA, etc., the kernel matrix is N×N (samples × samples = ~1,750×1,750). The number of features (1,000) is comparable to or smaller than the number of samples. The kernel trick is most beneficial when features >> samples (you implicitly map to a high-dimensional feature space and work in the N×N kernel space instead). Here, since N ≈ features, the kernel approach offers no dimensionality advantage. You are essentially doing a dense, expensive computation without meaningful gain. The gamma parameter controls the width of the RBF kernel and affects the shape of the feature space, but the fundamental issue remains: this dataset is not in the regime where kernel methods shine.
+
+
 ## Feature selection
 
 Now, you have to analyze the advantages and disadvantages of different feature selection schemes over this dataset. In particular, we propose you to study:
@@ -535,8 +582,52 @@ Now, you have to analyze the advantages and disadvantages of different feature s
 
 $^{(*)}$ The forward search with HSIC implementation has to be done by you from scratch and it requires from a large computational burden. To speed it up try to select features in steps of 10 or 20 instead of one by one. Besides, by comparison purposes, it is enough if you stop it when 100 features are selected.
 
+## Question 3 — Feature Selection
 
+**Filter methods:**
 
+Filter methods score features independently of the classifier, then rank and select the top-k.
 
+`f_classif` computes the ANOVA F-statistic for each feature — the ratio of between-class variance to within-class variance. It assumes Gaussian features and linear separability between classes. Fast to compute.
+
+`mutual_info_classif` estimates the mutual information between each feature and the target using k-nearest neighbor estimation. It captures non-linear dependencies and makes no distributional assumptions. Significantly slower than f_classif, especially with many features.
+
+`HSIC` (Hilbert-Schmidt Independence Criterion) measures statistical dependence between two random variables using kernel methods. It is computed as the normalized Frobenius inner product of two centered kernel matrices (one for X, one for Y). It captures non-linear dependencies, but computing it for 1,000 features individually is expensive. The notebook uses **subsampling** to speed this up: it computes HSIC on random 10% subsets of the training data across 10 iterations and averages. This gives a noisy but fast approximation.
+
+For classification, the notebook uses **binarized targets** with `label_binarize` when passing Y to HSIC. This is important: passing raw integer class labels would produce a 1D kernel that ignores the multi-class structure. Binarizing creates a 5-column binary matrix representing class membership, allowing the HSIC kernel to capture inter-class structure properly.
+
+**Wrapper methods:**
+
+RFE (Recursive Feature Elimination) trains the classifier, ranks features by coefficient magnitude, eliminates the least important one, and repeats. With LinearSVC, this is feasible. It produces a full ranking of all 1,000 features but requires ~1,000 classifier fits — expensive.
+
+Forward search with HSIC: Starts with the most relevant single feature, then at each step evaluates adding each candidate feature to the current set (using HSIC between the selected set and Y). Selects the one that maximizes joint HSIC. The notebook implements this in steps of 10–20 to reduce cost, stopping at 100 features. Even so, this is the most expensive method.
+
+MRmr (Maximum Relevance Minimum Redundancy): At each step, selects the candidate feature that maximizes `relevance(feature, Y) - mean_redundancy(feature, already_selected_features)`. The relevance uses HSIC scores precomputed in the filter step. The redundancy is measured by covariance between features. This is cheaper than full forward HSIC search because relevances are precomputed and redundancy is just a covariance lookup.
+
+**Embedded method — L1 SVM:**
+
+`LinearSVC` with `penalty='l1'` and `dual=False` drives many weight coefficients to exactly zero during training. This is because L1 regularization imposes a sparsity-inducing penalty. The C parameter controls regularization strength: small C → strong regularization → more zeros → fewer selected features (higher sparsity rate). The notebook sweeps C over a log-scale range from 1e-2 to 1e2 and tracks both accuracy and sparsity rate. For multiclass with one-vs-rest, `coef_` is a (n_classes × n_features) matrix, so the notebook sums across classes and identifies features that are zero in all class weight vectors.
+
+---
+
+## Things Worth Knowing for the Quiz
+
+**Sparse vs dense matrices.** `X_tfidf` is a scipy sparse matrix. Most sklearn transformers (PCA, PLS, CCA) require dense input — hence the `.toarray()` calls. However, `LinearSVC`, `f_classif`, and `mutual_info_classif` all accept sparse matrices directly. The `evaluate_FS` function converts to CSC format (column-sparse) because selecting columns from a CSC matrix is efficient; row-sparse (CSR) makes column slicing expensive.
+
+**PLS requires binarized labels.** `PLSSVD` expects a 2D Y matrix, not a 1D label vector. `label_binarize` converts [1,2,3,4,5] → a 5-column binary matrix. The notebook uses `n_components = n_classes - 1 = 4` because PLS can extract at most C-1 meaningful supervised directions for C classes (analogous to LDA).
+
+**CCA also needs binarized labels** for the same reason.
+
+**Pipeline leakage.** For supervised dimensionality reduction (PLS, CCA), the transform must be fit only on training data within each CV fold. The notebook demonstrates both the leaky version (fit on full training set outside CV) and the correct version with a manual KFold loop. Know the difference.
+
+**HSIC formula.** HSIC between X and Y is `(1/N²) * trace(K_x_centered @ K_y_centered)`, or equivalently the element-wise product of the two centered kernel matrices summed and normalized. Both formulations appear in the code.
+
+**L1 SVM in multiclass.** `LinearSVC` with L1 penalty uses `dual=False` because the L1 primal is solvable directly but the L1 dual is not standard. One-vs-rest is used by default, producing one weight vector per class. The sparsity rate is computed as the fraction of all coefficients (across all classes and features) that are exactly zero.
+
+**Why kernel methods don't help here.** The key is the ratio N/d. With N ≈ d (both around 1,000), you are not in the high-dimensional regime where kernels provide a computational or representational advantage. Kernel methods are most useful when d >> N.
+
+**Normalization and TF-IDF sparsity.** If someone asks on the quiz whether StandardScaler is appropriate for TF-IDF data: technically it works after converting to dense, but it destroys sparsity. L2 sample normalization is more natural for document vectors.
+
+![[Pasted image 20260302114830.png]]
 
 #publish
