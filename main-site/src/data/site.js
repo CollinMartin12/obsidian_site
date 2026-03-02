@@ -50,7 +50,7 @@ export const projects = [
     category: "Data Engineering",
     status: "Live",
     link: null,
-    image: null,
+    image: "/static/1_SF83wqI.max-2000x2000.png",
   },
   {
     title: "Farm Management API Integration",
@@ -59,7 +59,7 @@ export const projects = [
     category: "APIs",
     status: "Live",
     link: null,
-    image: null,
+    image: "/static/john_deere.jpeg",
   },
   {
     title: "Irrigation Control System Integration",
@@ -68,7 +68,7 @@ export const projects = [
     category: "IoT",
     status: "Live",
     link: null,
-    image: null,
+    image: "/static/circle.jpeg",
   },
   {
     title: "OCR Document Processing Pipeline",
