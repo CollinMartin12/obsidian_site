@@ -11,11 +11,11 @@ export const hero = {
 };
 
 export const about = {
-  intro: `I'm a Data Science and Data Engineering student at Universidad Carlos III de Madrid, the best Polytechnic University in Madrid — expected to graduate in May 2027.
+  intro: `I'm a Data Science and Data Engineering student at Universidad Carlos III de Madrid, a Polytechnic University in Madrid, Spain — expected to graduate in May 2027.
 
 Before that, I spent years operating heavy machinery on wheat farms in Odessa, Washington, where I developed a strong work ethic through frequent 14-hour harvest days. That resilience carries into everything I do.
 
-Now I build end-to-end data pipelines, machine learning models, and automation systems. My recent internship at Agops360 had me designing cloud-native pipelines for agricultural data, IoT telemetry, and regulatory compliance.
+Now I build end-to-end data pipelines, machine learning models, and automation systems. My recent internship at Agops360 had me designing cloud-native pipelines for agricultural data, data architecture, and IoT telemetry.
 
 I'm looking to return to my roots and establish a career in Washington.`,
   topics: [

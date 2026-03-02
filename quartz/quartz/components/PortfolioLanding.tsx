@@ -8,54 +8,30 @@ const PortfolioLanding: QuartzComponent = (_props: QuartzComponentProps) => {
         <div class="nav-container">
           <div class="nav-logo">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"
-                fill="currentColor"
-              />
+              <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z" fill="currentColor"/>
             </svg>
           </div>
           <div class="nav-links">
-            <a href="/" class="nav-link">
-              Home
-            </a>
-            <a href="/projects" class="nav-link">
-              Projects
-            </a>
-            <a href="/" class="nav-link">
-              Blog
-            </a>
+            <a href="/" class="nav-link">Home</a>
+            <a href="/projects" class="nav-link">Projects</a>
+            <a href="/Welcome" class="nav-link">Blog</a>
           </div>
         </div>
       </nav>
 
-      {/* Top Hero Section */}
-      <section class="intro-hero">
-        <div class="intro-container">
-          <h1 class="intro-title">Welcome to Collin Martin&apos;s Personal Website</h1>
-          <p class="intro-subtitle">An aspiring Data Scientist</p>
-          <div class="intro-actions">
-            <a href="mailto:hello@cmmdoes.com" class="intro-button primary">
-              Contact
-            </a>
-            <a href="/projects" class="intro-button secondary">
-              Projects
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* About + Photo Section */}
+      {/* Hero Section */}
       <section class="hero-section">
         <div class="hero-container">
           <div class="hero-content">
             <div class="hero-text">
-              <h2 class="hero-title">Collin Martin</h2>
+              <h1 class="hero-title">Collin Martin</h1>
               <p class="hero-subtitle">ABOUT ME</p>
               <button class="contact-button">CONTACT</button>
             </div>
             <div class="hero-image">
               <div class="profile-photo">
-                <img src="/static/profile-photo.jpg" alt="Collin Martin in Madrid" loading="lazy" />
+                {/* Replace with your actual profile photo */}
+                <div class="profile-placeholder">CM</div>
               </div>
             </div>
           </div>
@@ -66,7 +42,8 @@ const PortfolioLanding: QuartzComponent = (_props: QuartzComponentProps) => {
       <section class="university-section">
         <div class="university-container">
           <div class="university-logo">
-            <img src="/static/uc3m-logo.png" alt="Universidad Carlos III de Madrid logo" loading="lazy" />
+            {/* Replace with actual UC3M logo */}
+            <div class="university-logo-placeholder">UC3M</div>
           </div>
           <div class="university-content">
             <h2 class="university-title">Madrid UC3M 2027</h2>
@@ -86,7 +63,7 @@ const PortfolioLanding: QuartzComponent = (_props: QuartzComponentProps) => {
               <p>Call out a feature, benefit, or value of your site that can stand on its own.</p>
             </div>
           </div>
-
+          
           <div class="project-card project-2">
             <div class="project-texture"></div>
             <div class="project-content">
@@ -94,7 +71,7 @@ const PortfolioLanding: QuartzComponent = (_props: QuartzComponentProps) => {
               <p>Call out a feature, benefit, or value of your site that can stand on its own.</p>
             </div>
           </div>
-
+          
           <div class="project-card project-3">
             <div class="project-texture"></div>
             <div class="project-content">
